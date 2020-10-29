@@ -1,0 +1,256 @@
+#include<stdio.h>
+
+//实现链表的增删改查
+
+//定义链表节点
+typedef struct list
+{
+	int value;
+	struct list* next;
+}List;
+
+
+//创建n个节点的链表
+List* CreateList(int n)
+{
+	List* head, * node, * end;//头尾节点，普通节点
+	head = (List*)malloc(sizeof(List));//分配地址
+	if (head == NULL)//是否分配成功
+	{
+		printf("malloc fair!\n");
+	}
+	end = head;//初始化
+
+	for (int i = 1; i <= n; i++)
+	{
+		node = (List*)malloc(sizeof(List));
+		scanf_s("%d", &node->value);//将输入的数赋值给value
+		end->next = node;
+		end = node;
+	}
+
+	end->next = NULL;
+	return head;
+}
+
+
+//打印链表(注意：从头节点的下一个节点开始打印）
+void PrintList(List* head)
+{
+	List* p = head;
+	while (p->next!= NULL)
+	{
+		p = p->next;
+		printf("%d->", p->value);
+	}
+	puts("\n");
+}
+
+//修改链表第N个节点的值
+void ChangNode(List* head,int n)
+{
+	List* q = head;
+	int i = 0;
+	while (q != NULL && i < n)//遍历到链表第n个节点
+	{
+		q = q->next;
+		i++;
+	}
+	if (q != NULL)
+	{
+		puts("输入要修改的值：");
+		scanf_s("%d",&q->value);
+	}
+	else
+	{
+		puts("节点不存在！");
+	}
+}
+
+//删除链表第n个节点
+void deleteNode(List* head,int n)
+{
+	List *q = head,*p=NULL;//注意指针初始化
+	int i = 0;
+	while (q != NULL && i < n)//遍历链表
+	{
+		p = q;//保存前一个节点
+		q = q->next;
+		i++;
+	}
+	if (q != NULL)//第n个节点存在
+	{
+		p->next = q->next;
+		free(q);//注意删除
+	}
+	else
+	{
+		puts("节点不存在！");
+	}
+}
+
+//删除值为data的链表节点
+void deleteData(List* head, int val)
+{
+	List* q = head, * p = NULL;
+	while (q->next != NULL)
+	{
+		p = q;//保存当前节点的前一个节点的指针
+		q = q->next;//当前节点的指针
+		if (q->value == val)
+		{
+			//注意分情况：一种是普通节点，一种是尾节点
+			if (q->next == NULL)
+			{
+				p->next = NULL;
+				free(q);
+			}
+			else
+			{
+				p->next = q->next;
+				free(q);
+			}
+			return;
+		}
+	}
+
+	printf("没有要删除的节点！");
+}
+
+//在第n个节点后面插入
+void insertNode(List* head,int n)
+{
+	List *q = head,*p=NULL;
+	int i = 0;
+	while (i < n && q != NULL)
+	{
+		q = q->next;
+		i++;
+	}
+	if (q != NULL)
+	{
+		p = (List*)malloc(sizeof(List));
+		puts("输入要插入的值：");
+		scanf_s("%d",&p->value);
+		p->next = q->next;//连接
+		q->next = p;
+	}
+	else
+	{
+		puts("节点不存在！");
+	}
+}
+
+//查找值为m的节点
+void searchNodeValue(List* head,int m)
+{
+	List* q = head;
+	while (q != NULL)
+	{
+		if (q->value == m)
+		{
+			puts("该节点存在!\n");
+			return;
+		}
+		q = q->next;
+	}
+	puts("节点不存在！");
+}
+
+//查找第m个节点
+void searchNode(List* head, int m)
+{
+	List* q = head;
+	int i = 0;
+	while (i < m && q != NULL)
+	{
+		q = q->next;
+		i++;
+	}
+	if (q != NULL)
+	{
+		printf("%d", q->value);
+	}
+	else
+	{
+		printf("节点不存在");
+	}
+}
+
+
+//链表的逆序（考虑链表为空或者只有一个节点的情况,第一个节点是头结点的下一个节点）
+List* reverseList(List* head)
+{
+	List* q = head->next;//第一个节点
+	List* p2 = q->next;//第二个节点
+
+	if (q == NULL || p2 == NULL)//链表为空或者只有一个节点
+	{
+		printf("不需要逆序！");
+		return NULL;
+	}
+
+	q->next = NULL;//第一个节点指向空
+
+	List* p3 = NULL;//中间指针
+	while (p2 != NULL)//从第二个节点开始遍历
+	{
+		p3 = p2;//p3保存当前节点
+		p2 = p2->next;//更新节点p2
+		p3->next = q;//反向连接
+		q = p3;//更新q,往后移 
+	}
+
+	head = q;//新的头结点
+	return head;
+}
+
+//链表的拷贝
+List* copyList(List* head)
+{
+	List* p = head;
+	List* p1 = p->next;//原链表的第一个节点
+
+	List *tail,*newHead,*node;
+	newHead = (List*)malloc(sizeof(List));//新链表的头
+	tail = newHead;
+
+	while (p1 != NULL)//遍历原链表
+	{
+		node = (List*)malloc(sizeof(List));
+		node->value = p1->value;//赋值
+		tail->next = node;//连接
+
+		tail = node;//移动新链表
+		p1 = p1->next;//移动原链表
+	}
+
+	tail->next = NULL;//注意
+	return newHead;
+}
+
+int main(void)
+{
+	int n = 5;//节点的个数
+	List *head= CreateList(n);//创建链表
+	//PrintList(head);//打印链表
+
+	//ChangNode(head,5);//修改链表中第5个节点的值
+	//PrintList(head);
+
+	//deleteNode(head, 3);//删除节点
+	//PrintList(head);
+
+	//searchNode(head,6);//查找值为2的节点
+
+	//deleteData(head,4);//删除值为4的节点
+	//PrintList(head);
+
+	//List* new=reverseList(head);//
+	//PrintList(new);
+
+	List* new=copyList(head);
+	PrintList(new);
+
+	return 0;
+}
